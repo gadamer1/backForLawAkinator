@@ -8,6 +8,16 @@ const io = require("socket.io")(http, {
     methods: ["GET", "POST"],
   },
 });
+
+const results = [
+  "판례 A와 연관이 있습니다",
+  "판례 B와 연관이 있습니다",
+  "판례 C와 연관이 있습니다",
+  ,
+  "판례 D와 연관이 있습니다",
+  ,
+  "판례 E와 연관이 있습니다",
+];
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
@@ -35,7 +45,7 @@ io.on("connection", (socket) => {
     python.stdin.write(number);
     python.stdout.on('data', (data) => {
       dataTosend = data.toString();
-      io.emit("result", "판례 A와 연관이 있습니다");
+      io.emit("result", results);
     });
     
     console.log("number", number);
