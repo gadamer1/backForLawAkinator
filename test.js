@@ -14,9 +14,13 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   let dataTosend;
-  const python = spawn("python", ["test.py"]);
+
   console.log("a user connected");
-  
+  const python = spawn("python", ["test.py"]);
+  python.stdout.on('data', (data) => {
+    dataTosend = data.toString();
+    console.log("py well done" + dataTosend);
+  });
   /*socket.on("send message", (item) => {
     const msg = item.name + ":" + item.message;
     let msg1 = dataTosend;
@@ -24,20 +28,13 @@ io.on("connection", (socket) => {
     io.emit("receive message", { name: item.name, message: item.message });
   });*/
   socket.on("request question", () => {
-    console.log("request question")
-    python.stdout.on('data', (data) => {
-      dataTosend = data.toString();
-      console.log("py well done" + dataTosend);
-      io.emit("receive question", `${dataTosend}와 연관 있습니까?`);
-    });
+    console.log("request question");
+    let msg = dataTosend;
+    console.log(`msg: ${msg}`);
+    io.emit("receive question", "~와 연관이 있습니까?");
   });
   socket.on("answer", (number) => {
-    python.stdin.write(number);
-    python.stdout.on('data', (data) => {
-      dataTosend = data.toString();
-      io.emit("result", "판례 A와 연관이 있습니다");
-    });
-    
+    io.emit("result", "판례 A와 연관이 있습니다");
     console.log("number", number);
   });
   socket.on("disconnect", () => {

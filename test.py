@@ -1,0 +1,4 @@
+print("haaak")
+
+
+print("hiiiik")
