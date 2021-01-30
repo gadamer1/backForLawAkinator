@@ -1,6 +1,7 @@
 /* socket\app.js */
 const app = require("express")();
 const http = require("http").createServer(app);
+require("dotenv").config();
 const { spawn } = require("child_process");
 const io = require("socket.io")(http, {
   cors: {
@@ -64,6 +65,6 @@ io.on("connection", (socket) => {
     python.kill();
   });
 });
-http.listen(5000, () => {
-  console.log("Connected at 5000");
+http.listen(process.env.PORT, (PORT) => {
+  console.log(`Connected at ${process.env.PORT}`);
 });
