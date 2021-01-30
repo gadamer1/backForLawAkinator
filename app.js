@@ -4,10 +4,12 @@ const http = require("http").createServer(app);
 const { spawn } = require("child_process");
 const io = require("socket.io")(http, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
+
+let fin = false;
 
 const results = [
   "판례 A와 연관이 있습니다",
@@ -24,9 +26,9 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   let dataTosend;
-  const python = spawn("python", ["test.py"]);
+  const python = spawn("python", ["./src/main.py"]);
   console.log("a user connected");
-  
+
   /*socket.on("send message", (item) => {
     const msg = item.name + ":" + item.message;
     let msg1 = dataTosend;
@@ -34,24 +36,32 @@ io.on("connection", (socket) => {
     io.emit("receive message", { name: item.name, message: item.message });
   });*/
   socket.on("request question", () => {
-    console.log("request question")
-    python.stdout.on('data', (data) => {
+    console.log("request question");
+    python.stdout.on("data", (data) => {
       dataTosend = data.toString();
-      console.log("py well done" + dataTosend);
-      io.emit("receive question", `${dataTosend}와 연관 있습니까?`);
+      console.log(dataTosend);
+      io.emit("receive question", `${dataTosend}`);
     });
   });
-  socket.on("answer", (number) => {
-    python.stdin.write(number);
-    python.stdout.on('data', (data) => {
+  socket.on("answer", (payload) => {
+    console.log(payload);
+
+    python.stdin.write(payload.answer + "\n");
+    python.stdout.on("data", (data) => {
       dataTosend = data.toString();
-      io.emit("result", results);
+      if (dataTosend == "fin\n") {
+        fin = true;
+      } else if (fin) {
+        io.emit("result", dataTosend);
+        fin = false;
+      } else {
+        io.emit("receive question", dataTosend);
+      }
     });
-    
-    console.log("number", number);
   });
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
+    python.kill();
   });
 });
 http.listen(5000, () => {

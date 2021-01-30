@@ -1,4 +1,9 @@
+import sys
+
 print("haaak")
+sys.stdout.flush()
 
+i = int(input())
 
-print("hiiiik")
+print(i)
+sys.stdout.flush()

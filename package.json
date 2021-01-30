@@ -4,12 +4,19 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "build": "pkg ."
   },
-  "author": "",
+  "bin": {
+    "app": "."
+  },
+  "author": "gadamer1",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
     "socket.io": "^3.1.0"
+  },
+  "devDependencies": {
+    "pkg": "^4.4.9"
   }
 }
